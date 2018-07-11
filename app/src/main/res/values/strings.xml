@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">MusicPlayer</string>
+    <string name="title_activity_song_picked">SongPicked</string>
+    <string name="title_activity_equalizer">EqualizerActivity</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+
+</resources>

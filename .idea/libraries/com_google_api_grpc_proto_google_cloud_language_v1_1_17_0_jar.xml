@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="com.google.api.grpc:proto-google-cloud-language-v1:1.17.0@jar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.api.grpc/proto-google-cloud-language-v1/1.17.0/6837fdf67718d9ecbe9dc649f88c75f22506905b/proto-google-cloud-language-v1-1.17.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.api.grpc/proto-google-cloud-language-v1/1.17.0/2b7cb830f28563a09696390c26c1df513407f8b3/proto-google-cloud-language-v1-1.17.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

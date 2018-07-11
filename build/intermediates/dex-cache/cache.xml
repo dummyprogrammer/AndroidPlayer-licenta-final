@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="true"
+        jar="/Users/razvan/Downloads/AndroidPlayer-master-5/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="0151284afa548eaa921f86f9752fb65f143ecf13">
+        <dex dex="/Users/razvan/Downloads/AndroidPlayer-master-5/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_c895b9ba1a0e30f56b4a100ca35871b568fd86bf/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/razvan/.gradle/caches/modules-2/files-2.1/com.google.guava/guava-jdk5/17.0/463f8378feba44df7ba7cd9272d01837dad62b36/guava-jdk5-17.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="463f8378feba44df7ba7cd9272d01837dad62b36">
+        <dex dex="/Users/razvan/Downloads/AndroidPlayer-master-5/app/build/intermediates/transforms/dex/debug/folders/1000/10/guava-jdk5-17.0_e3bad747d4c9b04e79149a58e8c8c414c65ea564/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/razvan/.gradle/caches/modules-2/files-2.1/com.google.apis/google-api-services-language/v1-rev386-1.21.0/4fc3e92bf1e18971dd90927835613bd391435312/google-api-services-language-v1-rev386-1.21.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="4fc3e92bf1e18971dd90927835613bd391435312">
+        <dex dex="/Users/razvan/Downloads/AndroidPlayer-master-5/app/build/intermediates/transforms/dex/debug/folders/1000/10/google-api-services-language-v1-rev386-1.21.0_bacdbbfa180c6e829fcd875493ec4e0ee39481ce/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/razvan/.gradle/caches/modules-2/files-2.1/com.google.oauth-client/google-oauth-client/1.21.0/61ec42bbfc51aafde5eb8b4923c602c5b5965bc2/google-oauth-client-1.21.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="61ec42bbfc51aafde5eb8b4923c602c5b5965bc2">
+        <dex dex="/Users/razvan/Downloads/AndroidPlayer-master-5/app/build/intermediates/transforms/dex/debug/folders/1000/10/google-oauth-client-1.21.0_0feffa92dcd38d81cab1d4dc3e0b53607dbb22d9/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/razvan/.gradle/caches/modules-2/files-2.1/com.google.http-client/google-http-client-jackson2/1.21.0/8ce17bdd15fff0fd8cf359757f29e778fc7191ad/google-http-client-jackson2-1.21.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="8ce17bdd15fff0fd8cf359757f29e778fc7191ad">
+        <dex dex="/Users/razvan/Downloads/AndroidPlayer-master-5/app/build/intermediates/transforms/dex/debug/folders/1000/10/google-http-client-jackson2-1.21.0_73b3c24a8e23d1d011e374a4f89838e4b66a2df1/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/razvan/.gradle/caches/modules-2/files-2.1/com.google.api-client/google-api-client/1.21.0/16a6b3c680f3bf7b81bb42790ff5c1b72c5bbedc/google-api-client-1.21.0.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="16a6b3c680f3bf7b81bb42790ff5c1b72c5bbedc">
+        <dex dex="/Users/razvan/Downloads/AndroidPlayer-master-5/app/build/intermediates/transforms/dex/debug/folders/1000/10/google-api-client-1.21.0_379a61d8d869b57954cd4d703426f1e36d424847/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/razvan/Downloads/AndroidPlayer-master-5/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="510aa6efc159983dfbffa676a0dae37568c0a46f">
+        <dex dex="/Users/razvan/Downloads/AndroidPlayer-master-5/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run_dedc6db83d91dc3998bc1f6f19351ffc0e351a57/classes.dex" />
+    </item>
+
+</items>

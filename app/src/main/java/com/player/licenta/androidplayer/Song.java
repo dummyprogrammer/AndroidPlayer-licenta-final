@@ -10,12 +10,15 @@ public class Song implements Serializable
 	private long id;
 	private String title;
 	private String artist;
+	private String lyrics;
+	private String genre;
 	
-	public Song(long songID, String songTitle, String songArtist) 
+	public Song(long songID, String songTitle, String songArtist, String songGenre)
 	{
 		id=songID;
 		title=songTitle;
 		artist=songArtist;
+		genre=songGenre;
 	}
 	
 	public long getID()
@@ -33,4 +36,19 @@ public class Song implements Serializable
 		return artist;
 	}
 
+    public String getLyrics() {
+        return lyrics;
+    }
+
+    public void setLyrics(String lyrics) {
+        this.lyrics = lyrics;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
 }

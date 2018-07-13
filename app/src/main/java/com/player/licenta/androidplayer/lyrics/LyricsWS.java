@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.auth.Credentials;
+import com.player.licenta.androidplayer.Song;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -22,6 +23,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -34,19 +36,26 @@ public class LyricsWS extends AsyncTask<Object, Void, Void>  {
 
     private final static String TAG = "LyricsWS";
     private final String LYRICS_URL = "http://api.chartlyrics.com/apiv1.asmx/SearchLyricDirect?";
+    private Song m_song;
     URI m_uri;
     private String m_lyrics;
     private Credentials m_credentials;
 
-    public void setParams(String artist, String song)
+    private static HashMap<Song, String> songs = new HashMap<>();
+    private String songName;
+    private String artistName;
+    private Song currentSong;
+
+    public LyricsWS(Song song)
     {
-        artist = artist.replaceAll(" ", "+");
-        song = song.replaceAll(" ", "+");
+        m_song = song;
+        String artist = song.getArtist().replaceAll(" ", "+");
+        String songName = song.getTitle().replaceAll(" ", "+");
         try {
             m_uri = new URI(LYRICS_URL +
                     "artist=" + artist +
                     "&" +
-                    "song=" + song);
+                    "song=" + songName);
         }
         catch (URISyntaxException e)
         {
@@ -82,6 +91,7 @@ public class LyricsWS extends AsyncTask<Object, Void, Void>  {
             Node node = (Element) nodeList.item(0);
             Element element = (Element) node;
             m_lyrics = element.getElementsByTagName("Lyric").item(0).getTextContent();
+            m_song.setLyrics(m_lyrics);
 
             Log.d(TAG, m_lyrics);
         } catch (IOException e) {

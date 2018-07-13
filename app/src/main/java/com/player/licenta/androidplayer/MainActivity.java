@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,6 +25,7 @@ import com.google.auth.oauth2.OAuth2Credentials;
 import com.player.licenta.androidplayer.MusicService.MusicBinder;
 import com.player.licenta.androidplayer.lyrics.AccessTokenLoader;
 import com.player.licenta.androidplayer.lyrics.LyricsWS;
+import com.player.licenta.androidplayer.moodsorter.MoodSorter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -179,22 +181,39 @@ public class MainActivity extends Activity
     	Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
     	Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
 
+    	String[] genresProjection = {
+                MediaStore.Audio.Genres.NAME,
+                MediaStore.Audio.Genres._ID
+        };
+
+
         if(musicCursor!=null && musicCursor.moveToFirst())
         {
 			//get columns
-			int titleColumn = musicCursor.getColumnIndex
-			(android.provider.MediaStore.Audio.Media.TITLE);
-			int idColumn = musicCursor.getColumnIndex
-			(android.provider.MediaStore.Audio.Media._ID);
-			int artistColumn = musicCursor.getColumnIndex
-			(android.provider.MediaStore.Audio.Media.ARTIST);
+			int titleColumn = musicCursor.getColumnIndex(android.provider.MediaStore.Audio.Media.TITLE);
+			int idColumn = musicCursor.getColumnIndex(android.provider.MediaStore.Audio.Media._ID);
+			int artistColumn = musicCursor.getColumnIndex(android.provider.MediaStore.Audio.Media.ARTIST);
+
 			//add songs to list
 			do
 			{
-				long thisId = musicCursor.getLong(idColumn);
+				int songId = musicCursor.getInt(idColumn);
 				String thisTitle = musicCursor.getString(titleColumn);
 				String thisArtist = musicCursor.getString(artistColumn);
-				songList.add(new Song(thisId, thisTitle, thisArtist));
+
+                Uri uri = MediaStore.Audio.Genres.getContentUriForAudioId("external", songId);
+                Cursor genresCursor = getContentResolver().query(uri,
+                        genresProjection, null, null, null);
+                int genre_column_index = genresCursor.getColumnIndexOrThrow(MediaStore.Audio.Genres.NAME);
+
+				String genre = "";
+                if (genresCursor.moveToFirst()) {
+                    do {
+                        genre += genresCursor.getString(genre_column_index) + " ";
+                    } while (genresCursor.moveToNext());
+                }
+
+				songList.add(new Song(songId, thisTitle, thisArtist, genre));
 			}
 			while (musicCursor.moveToNext());
         }
@@ -264,13 +283,13 @@ public class MainActivity extends Activity
     private void onCredentialsRetrieved()
     {
         Song currentSong  = (Song)songList.get(m_selectedSongIndex);
-        String songTitle = currentSong.getTitle().toString();
-        String songArtist = currentSong.getArtist().toString();
+        String songTitle = currentSong.getTitle();
+        String songArtist = currentSong.getArtist();
         String[] songInfo = {songArtist, songTitle};
-        LyricsWS getLyricsTask = new LyricsWS();
-        getLyricsTask.setParams(songArtist, songTitle);
-        getLyricsTask.setCredentials(m_credentials);
-        getLyricsTask.execute();
+        //LyricsWS getLyricsTask = new LyricsWS();
+        //getLyricsTask.setParams(songArtist, songTitle);
+        //getLyricsTask.setCredentials(m_credentials);
+        //getLyricsTask.execute();
     }
 
 	private void showCoverArtActivity(View view)
@@ -309,9 +328,8 @@ public class MainActivity extends Activity
     	//menu item selected
     	switch (item.getItemId())
     	{
-    		case R.id.preferences_item:
-    		    Intent intent = new Intent(this, SettingsActivity.class);
-    		    startActivity(intent);
+    		case R.id.sort_item:
+    		    sendSongsInfoToMoodSorter();
     			break;
 
     		case R.id.action_shuffle:
@@ -319,6 +337,10 @@ public class MainActivity extends Activity
     			 break;
     	}
     	return super.onOptionsItemSelected(item);
+    }
+
+    private void sendSongsInfoToMoodSorter() {
+        MoodSorter moodSorter = new MoodSorter(songList);
     }
 
     @Override

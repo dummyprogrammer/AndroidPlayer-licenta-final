@@ -6,7 +6,7 @@
   android:orientation="vertical"
   android:padding="5dp" >
   
-  
+
  
   <TextView
     android:id="@+id/song_title"
@@ -20,7 +20,19 @@
     android:id="@+id/song_artist"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:layout_toRightOf="@+id/song_title"
     android:textColor="#FFFFFF99"
     android:textSize="18sp" />
- 
+
+    <TextView
+     android:id="@+id/genre"
+     android:layout_width="fill_parent"
+     android:layout_height="wrap_content"
+     android:layout="@id/song_title"
+     android:layout_toRightOf="@+id/song_title"
+     android:textColor="#FFFFFF99"
+     android:textSize="18sp" />
+
+
+
 </LinearLayout>

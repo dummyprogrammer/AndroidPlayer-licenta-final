@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
@@ -25,6 +26,7 @@ public class SongAdapter extends BaseAdapter
 	
 	private TextView artistView;
 	private TextView songView;
+	private TextView genreView;
 	private Song currSong;
 	private int highlightedRowIndex = INVALID_ROW_INDEX;
 	
@@ -66,6 +68,7 @@ public class SongAdapter extends BaseAdapter
 		//get title and artist views
 		songView = (TextView)songLay.findViewById(R.id.song_title);
 		artistView = (TextView)songLay.findViewById(R.id.song_artist);
+		genreView = (TextView)songLay.findViewById(R.id.genre);
 		
 		//get song using position
 		currSong = songs.get(position);
@@ -73,12 +76,14 @@ public class SongAdapter extends BaseAdapter
 		//get title and artist strings
 		songView.setText(currSong.getTitle());
 		artistView.setText(currSong.getArtist());
+		genreView.setText(currSong.getGenre());
 
 		if((highlightedRowIndex != INVALID_ROW_INDEX) &&
 			(position == highlightedRowIndex))
 		{
 			songView.setTextColor(Color.WHITE);
 			artistView.setTextColor(Color.WHITE);
+			genreView.setTextColor(Color.WHITE);
 		}
 
 

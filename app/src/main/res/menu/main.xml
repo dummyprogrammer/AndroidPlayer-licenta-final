@@ -8,7 +8,7 @@
     android:title="Shuffle"/>
 
     <item
-        android:id="@+id/preferences_item"
+        android:id="@+id/sort_item"
         android:icon="@drawable/tools"
         android:orderInCategory="2"
         android:showAsAction="always"

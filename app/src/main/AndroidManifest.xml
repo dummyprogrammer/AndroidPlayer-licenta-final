@@ -39,6 +39,9 @@
         <activity
             android:name=".EqualizerActivity"
             android:label="@string/title_activity_equalizer" />
+        <activity
+            android:name=".PlaylistActivity">
+        </activity>
     </application>
 
 </manifest>

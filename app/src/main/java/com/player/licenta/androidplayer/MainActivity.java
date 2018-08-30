@@ -23,19 +23,19 @@ import com.google.auth.Credentials;
 import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.OAuth2Credentials;
 import com.player.licenta.androidplayer.MusicService.MusicBinder;
+import com.player.licenta.androidplayer.adapter.PlaylistAdapter;
 import com.player.licenta.androidplayer.lyrics.AccessTokenLoader;
-import com.player.licenta.androidplayer.lyrics.LyricsWS;
 import com.player.licenta.androidplayer.moodsorter.MoodSorter;
+import com.player.licenta.androidplayer.util.Utils;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 
 public class MainActivity extends Activity
 {
     private static final int LOADER_ACCESS_TOKEN = 1;
     private ArrayList<Song> songList;
+    private ArrayList<String> genresList;
 	private ListView songView;
     //private SeekBar volumeControl;
 
@@ -46,7 +46,9 @@ public class MainActivity extends Activity
 
 	private MusicController controller;
 
+	private ListView genresListView;
 	private SongAdapter songAdt;
+	private PlaylistAdapter genresListAdapter;
 
 	private boolean paused=false, playbackPaused=false;
 
@@ -57,6 +59,8 @@ public class MainActivity extends Activity
 
 	public final static String EXTRA_MESSAGE = "com.mycompany.myfirstapp.MESSAGE";
 	private final static String TAG = "MainActivity";
+
+    private final static String ALL_MUSIC = "all music";
 
 	//connect to the service
 	private ServiceConnection musicConnection = new ServiceConnection()
@@ -69,7 +73,7 @@ public class MainActivity extends Activity
 			musicSrv.setList(songList);
 			musicSrv.setOnSongFinishedListener(songChangedLister);
 			musicBound = true;
-			setController();
+			//setController();
 		}
 
 		@Override
@@ -86,51 +90,12 @@ public class MainActivity extends Activity
     {
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        songView = (ListView)findViewById(R.id.song_list);
-        //volumeControl = (SeekBar)findViewById(R.id.volume);
-		//volumeControl.setProgress(100);
         songList = new ArrayList<Song>();
 		getSongList();
-
-        Collections.sort(songList, new Comparator<Song>()
-        {
-            public int compare(Song a, Song b)
-            {
-                return a.getTitle().compareTo(b.getTitle());
-            }
-        });
-
-        songAdt = new SongAdapter(this, songList);
-        songView.setAdapter(songAdt);
-
-		songChangedLister = new MusicService.OnSongChangedListener()
-		{
-			@Override
-			public void onSongChanged(Song newSong)
-			{
-				songAdt.setHighlightRow(musicSrv.getSongIndex());
-			}
-		};
-
-        /*volumeControl.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
-        {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
-            {
-                System.out.println("Volume: " + progress);
-                musicSrv.setVolume(progress);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar)
-            {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar)
-            {
-            }
-        });*/
+		getGenresFromUtils();
+        genresListView = (ListView) findViewById(R.id.playlist);
+        genresListAdapter = new PlaylistAdapter(this, genresList);
+        genresListView.setAdapter(genresListAdapter);
 
 		Log.d(TAG, "onCreate called");
 	}
@@ -152,12 +117,12 @@ public class MainActivity extends Activity
     protected void onResume()
     {
         super.onResume();
-		if (controller != null)
-        {
-            controller.show();
-            songAdt.setHighlightRow(musicSrv.getSongIndex());
-			musicSrv.setOnSongFinishedListener(songChangedLister);
-        }
+//		if (controller != null)
+//        {
+//            controller.show();
+//            songAdt.setHighlightRow(musicSrv.getSongIndex());
+//			musicSrv.setOnSongFinishedListener(songChangedLister);
+//        }
     }
 
     @Override
@@ -212,11 +177,17 @@ public class MainActivity extends Activity
                         genre += genresCursor.getString(genre_column_index) + " ";
                     } while (genresCursor.moveToNext());
                 }
-
+                if(genre.isEmpty()){
+                    genre = ALL_MUSIC;
+                }
 				songList.add(new Song(songId, thisTitle, thisArtist, genre));
 			}
 			while (musicCursor.moveToNext());
         }
+    }
+
+    public void getGenresFromUtils(){
+        genresList = Utils.getGenres(songList);
     }
 
 	public void songPicked(View view)
@@ -242,6 +213,26 @@ public class MainActivity extends Activity
             ex.printStackTrace();
 		}
 	}
+
+    public void playlistPicked(View view){
+
+        ArrayList<Song> groupedSongs = new ArrayList<>();
+        String currentGenre = view.getTag().toString();
+        if(currentGenre.equals(ALL_MUSIC)){
+            groupedSongs = songList;
+        }else{
+            groupedSongs = Utils.getGroupedSongs(songList, currentGenre);
+        }
+        Bundle extras = new Bundle();
+        extras.putSerializable("grouped_songs", groupedSongs);
+        extras.putString("chosen_genre", currentGenre);
+
+        Intent intent = new Intent(this, PlaylistActivity.class);
+        intent.putExtras(extras);
+
+        startActivity(intent);
+
+    }
 
 	private void sendInfoToLyricsWS(View view)
     {
@@ -387,5 +378,6 @@ public class MainActivity extends Activity
         controller.setMediaPlayer(musicSrv);
 		controller.setAnchorView(findViewById(R.id.song_list));
 		controller.setEnabled(true);
+		controller.show();
 	}
 }

@@ -50,6 +50,7 @@ MediaPlayer.OnCompletionListener, MediaController.MediaPlayerControl
 	private Random rand;
 
 	private String songPath;
+	private String currentGenre;
 
 	public void onCreate()
 	{

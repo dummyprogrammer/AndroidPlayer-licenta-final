@@ -1,5 +1,7 @@
 package com.player.licenta.androidplayer.spotify;
 
+import android.content.ContentValues;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -29,6 +31,11 @@ public class SpotifySearch extends AsyncTask<String, Void, Void> {
     private String mTrackId;
     private String mSongTitle;
     private String mSongArtist;
+    private Context mContext;
+
+    public SpotifySearch(Context context){
+        mContext = context;
+    }
 
     public void getTrackInfo(String authToken, String songTitle, String songArtist) {
         try {
@@ -55,8 +62,8 @@ public class SpotifySearch extends AsyncTask<String, Void, Void> {
             String response = sb.toString();
             boolean isSongFound = validateTrack(response);
             if(isSongFound){
-                SpotifyAnalysis spotifyAnalysis = new SpotifyAnalysis();
-                spotifyAnalysis.execute(mTrackId, authToken);
+                SpotifyAnalysis spotifyAnalysis = new SpotifyAnalysis(mContext);
+                spotifyAnalysis.execute(mTrackId, authToken, songTitle, songArtist);
                 Log.d(TAG,"Song found" + mTrackId);
             } else {
                 Log.d(TAG,"Song not found");

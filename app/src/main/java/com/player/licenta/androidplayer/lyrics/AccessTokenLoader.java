@@ -48,7 +48,7 @@ public class AccessTokenLoader extends AsyncTaskLoader<String> {
     @Override
     public String loadInBackground() {
 
-        final SharedPreferences prefs =
+      /*  final SharedPreferences prefs =
                 getContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         String currentToken = prefs.getString(PREF_ACCESS_TOKEN, null);
 
@@ -78,7 +78,7 @@ public class AccessTokenLoader extends AsyncTaskLoader<String> {
             return accessToken;
         } catch (IOException e) {
             Log.e(TAG, "Failed to obtain access token.", e);
-        }
+        }*/
         return null;
     }
 

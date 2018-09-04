@@ -45,14 +45,12 @@ public class SongAdapter extends BaseAdapter
 	@Override
 	public Object getItem(int arg0) 
 	{
-	    // TODO Auto-generated method stub
 	    return null;
 	}
 	 
 	@Override
 	public long getItemId(int arg0) 
 	{
-	    // TODO Auto-generated method stub
 	    return 0;
 	}
 	 

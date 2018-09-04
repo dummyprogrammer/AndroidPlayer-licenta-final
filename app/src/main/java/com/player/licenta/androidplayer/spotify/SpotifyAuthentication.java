@@ -1,7 +1,16 @@
 package com.player.licenta.androidplayer.spotify;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
+import android.provider.BaseColumns;
 import android.util.Log;
+
+import com.player.licenta.androidplayer.Song;
+import com.player.licenta.androidplayer.database.MoodSortedHelper;
+import com.player.licenta.androidplayer.database.MoodSorterContract;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -27,18 +36,21 @@ import java.util.List;
  * Created by razvan on 8/27/18.
  */
 
-public class SpotifyAuthentication extends AsyncTask<String, Void, Void> {
+public class SpotifyAuthentication extends AsyncTask<ArrayList<Song>, Void, Void> {
 
     private String mToken;
-    private String mSongTitle;
-    private String mSongArtist;
+    private ArrayList<Song> songList;
+    private Context mContext;
 
     private final static String TAG = "SpotifyAuthentication";
 
+    public SpotifyAuthentication(Context context){
+        mContext = context;
+    }
+
     @Override
-    protected Void doInBackground(String... songData) {
-        mSongTitle = songData[0];
-        mSongArtist = songData[1];
+    protected Void doInBackground(ArrayList<Song>... receivedSongList) {
+        songList = receivedSongList[0];
         mToken = getAuthenticationToken();
 
         return null;
@@ -89,8 +101,67 @@ public class SpotifyAuthentication extends AsyncTask<String, Void, Void> {
     }
 
     private void getTrackData(String mToken) {
-        SpotifySearch spotifyUtil = new SpotifySearch();
-        spotifyUtil.execute(mToken, mSongTitle, mSongArtist);
+        for (Song song: songList){
+            String songTitle = song.getTitle();
+            String songArtist = song.getArtist();
+            if(!isSongStored(songTitle, songArtist)){
+                SpotifySearch spotifySearch = new SpotifySearch(mContext);
+                spotifySearch.execute(mToken, songTitle, songArtist);
+            }
+        }
+    }
+
+
+    public boolean isSongStored(String songTitle, String songArtist){
+
+        selectAllRecords();
+        //mContext.deleteDatabase(MoodSortedHelper.DATABASE_NAME);
+
+        MoodSortedHelper moodSortedHelper = new MoodSortedHelper(mContext);
+        SQLiteDatabase db = moodSortedHelper.getReadableDatabase();
+
+        String[] projection = {
+                MoodSorterContract.MoodSorterEntry.COLUMN_NAME_SONGTITLE,
+                MoodSorterContract.MoodSorterEntry.COLUMN_NAME_SONGARTIST
+        };
+        String selection = MoodSorterContract.MoodSorterEntry.COLUMN_NAME_SONGTITLE + " =?" +
+                " AND " + MoodSorterContract.MoodSorterEntry.COLUMN_NAME_SONGARTIST + " =?" ;
+        String[] selectionArgs = {songTitle, songArtist};
+
+        Cursor cursor = db.query(
+                MoodSorterContract.MoodSorterEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+            );
+        if((cursor != null) && !(cursor.getCount() == 0)){
+            return true;
+        }
+        cursor.close();
+        db.close();
+        return false;
+    }
+
+    public void selectAllRecords() {
+        MoodSortedHelper moodSortedHelper = new MoodSortedHelper(mContext);
+        SQLiteDatabase db = moodSortedHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM moodsorter", null);
+        List<String> records = new ArrayList<>();
+        if (cursor.moveToFirst()){
+            records.add(cursor.getString(cursor.getColumnIndex(MoodSorterContract.MoodSorterEntry.COLUMN_NAME_SONGTITLE)));
+            while(cursor.moveToNext()){
+                records.add(cursor.getString(cursor.getColumnIndex(MoodSorterContract.MoodSorterEntry.COLUMN_NAME_SONGTITLE)));
+            }
+        }
+        cursor.close();
+        db.close();
+
+        for (String songTitle: records){
+            Log.d(TAG, "Song titles in the database: " + songTitle);
+        }
     }
 
 }

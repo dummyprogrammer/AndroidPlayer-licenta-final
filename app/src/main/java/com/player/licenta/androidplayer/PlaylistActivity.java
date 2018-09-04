@@ -25,7 +25,7 @@ public class PlaylistActivity extends Activity {
 
     private MusicService musicSrv;
     private Intent playIntent;
-    private boolean musicBound=false;
+    private boolean musicBound = false;
     private MusicService.OnSongChangedListener songChangedLister;
     private MusicController controller;
     private final static String TAG = "PlaylistActivity";
@@ -35,12 +35,10 @@ public class PlaylistActivity extends Activity {
     private String lastGenre = "";
 
     //connect to the service
-    private ServiceConnection musicConnection = new ServiceConnection()
-    {
+    private ServiceConnection musicConnection = new ServiceConnection() {
         @Override
-        public void onServiceConnected(ComponentName name, IBinder service)
-        {
-            MusicService.MusicBinder binder = (MusicService.MusicBinder)service;
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
             musicSrv = binder.getService();
             musicSrv.setList(songList);
             musicSrv.setOnSongFinishedListener(songChangedLister);
@@ -49,8 +47,7 @@ public class PlaylistActivity extends Activity {
         }
 
         @Override
-        public void onServiceDisconnected(ComponentName name)
-        {
+        public void onServiceDisconnected(ComponentName name) {
             musicBound = false;
         }
 
@@ -63,7 +60,7 @@ public class PlaylistActivity extends Activity {
         setContentView(R.layout.activity_playlist);
 
         getSongsFromIntent();
-        songView = (ListView)findViewById(R.id.song_list);
+        songView = (ListView) findViewById(R.id.song_list);
         songAdapter = new SongAdapter(this, songList);
         songAdapter.notifyDataSetChanged();
         songView.setAdapter(songAdapter);
@@ -76,28 +73,23 @@ public class PlaylistActivity extends Activity {
         Bundle extras = intent.getExtras();
 
         chosenGenre = intent.getStringExtra("chosen_genre");
-        songList = (ArrayList<Song>)intent.getSerializableExtra("grouped_songs");
+        songList = (ArrayList<Song>) intent.getSerializableExtra("grouped_songs");
     }
 
-    private void setController()
-    {		//set the controller up
+    private void setController() {        //set the controller up
         controller = new MusicController(this);
 
         controller.setPrevNextListeners(
-                new View.OnClickListener()
-                {
+                new View.OnClickListener() {
                     @Override
-                    public void onClick(View v)
-                    {
+                    public void onClick(View v) {
                         musicSrv.playNext();
                         songAdapter.setHighlightRow(musicSrv.getSongIndex());
                     }
                 },
-                new View.OnClickListener()
-                {
+                new View.OnClickListener() {
                     @Override
-                    public void onClick(View v)
-                    {
+                    public void onClick(View v) {
                         musicSrv.playPrev();
                         songAdapter.setHighlightRow(musicSrv.getSongIndex());
                     }
@@ -113,11 +105,9 @@ public class PlaylistActivity extends Activity {
     }
 
     @Override
-    protected void onStart()
-    {
+    protected void onStart() {
         super.onStart();
-        if(playIntent==null)
-        {
+        if (playIntent == null) {
             playIntent = new Intent(this, MusicService.class);
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
             startService(playIntent);
@@ -125,19 +115,15 @@ public class PlaylistActivity extends Activity {
         Log.d(TAG, "onStart called");
     }
 
-    public void songPicked(View view)
-    {
-        try
-        {
+    public void songPicked(View view) {
+        try {
             int songIndex = Integer.parseInt(view.getTag().toString());
-            Song currentSong  = (Song)songList.get(songIndex);
+            Song currentSong = (Song) songList.get(songIndex);
             String songTitle = currentSong.getTitle().toString();
             String songArtist = currentSong.getArtist().toString();
 
-            if(songIndex >= 0)
-            {
-                if (songIndex != musicSrv.getSongIndex() || !chosenGenre.equals(lastGenre))
-                {
+            if (songIndex >= 0) {
+                if (songIndex != musicSrv.getSongIndex() || !chosenGenre.equals(lastGenre)) {
                     musicSrv.playSong(songIndex);
                     songAdapter.setHighlightRow(musicSrv.getSongIndex());
                 }
@@ -146,27 +132,24 @@ public class PlaylistActivity extends Activity {
                 controller.show();
                 showCoverArtActivity(view);
                 sendInfoToLyricsWS(view);
-                sendInfoToSpotifyTask(songTitle, songArtist);
+                sendInfoToSpotifyTask(songList);
             }
-        }
-        catch(NumberFormatException ex)
-        {
+        } catch (NumberFormatException ex) {
             ex.printStackTrace();
         }
     }
 
-    public void sendInfoToSpotifyTask(String songTitle, String songArtist) {
-        SpotifyAuthentication spotifyAuthentication = new SpotifyAuthentication();
-        spotifyAuthentication.execute(songTitle, songArtist);
+    public void sendInfoToSpotifyTask(ArrayList<Song> songList) {
+        SpotifyAuthentication spotifyAuthentication = new SpotifyAuthentication(getApplicationContext());
+        spotifyAuthentication.execute(songList);
     }
 
 
-    private void showCoverArtActivity(View view)
-    {
+    private void showCoverArtActivity(View view) {
         Intent intent = new Intent(this, SongPickedActivity.class);
         Integer index = Integer.parseInt(view.getTag().toString());
 
-        Song currentSong  = (Song)songList.get(index);
+        Song currentSong = (Song) songList.get(index);
         String songTitle = currentSong.getTitle().toString();
         String songArtist = currentSong.getArtist().toString();
 
@@ -184,16 +167,14 @@ public class PlaylistActivity extends Activity {
         startActivity(intent);
     }
 
-    private void sendInfoToLyricsWS(View view)
-    {
+    private void sendInfoToLyricsWS(View view) {
         m_selectedSongIndex = Integer.parseInt(view.getTag().toString());
         //retrieveCredentials(); // FIXME
         onCredentialsRetrieved();
     }
 
-    private void onCredentialsRetrieved()
-    {
-        Song currentSong  = (Song)songList.get(m_selectedSongIndex);
+    private void onCredentialsRetrieved() {
+        Song currentSong = (Song) songList.get(m_selectedSongIndex);
         String songTitle = currentSong.getTitle();
         String songArtist = currentSong.getArtist();
         String[] songInfo = {songArtist, songTitle};
@@ -204,8 +185,7 @@ public class PlaylistActivity extends Activity {
     }
 
     @Override
-    protected void onDestroy()
-    {
+    protected void onDestroy() {
         Log.d(TAG, "onDestroy called");
 
         controller.hide();
@@ -216,8 +196,7 @@ public class PlaylistActivity extends Activity {
     }
 
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
     }
 }

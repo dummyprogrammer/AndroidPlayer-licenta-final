@@ -57,7 +57,6 @@ public class MainActivity extends Activity
     Credentials m_credentials;
     Integer m_selectedSongIndex = 0;
 
-	public final static String EXTRA_MESSAGE = "com.mycompany.myfirstapp.MESSAGE";
 	private final static String TAG = "MainActivity";
 
     private final static String ALL_MUSIC = "all music";

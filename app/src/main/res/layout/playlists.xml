@@ -1,21 +1,20 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:onClick="playlistPicked"
     android:orientation="vertical"
-    android:padding="5dp" >
+    android:padding="5dp">
 
 
     <TextView
         android:id="@+id/genre"
         android:layout_width="fill_parent"
         android:layout_height="50dp"
-        android:textColor="#FFFFFF99"
-        android:background="#ea7d23"
+        android:background="#0A0909"
+        android:textColor="#FFFFFF"
         android:textSize="20sp"
         android:textStyle="bold" />
 
 
-
-</LinearLayout>
+</RelativeLayout>

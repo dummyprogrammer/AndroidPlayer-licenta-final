@@ -2,27 +2,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#f06d00"
+    android:background="#0A0909"
     android:orientation="vertical"
-    tools:context=".PlaylistActivity" >
-
-
-
-
-    <!--<SeekBar-->
-    <!--android:id="@+id/volume"-->
-    <!--android:layout_marginBottom="50px"-->
-    <!--android:layout_width="fill_parent"-->
-    <!--android:layout_height="wrap_content" >-->
-    <!--</SeekBar>-->
+    tools:context=".activities.PlaylistActivity" >
 
     <ListView
-    android:id="@+id/song_list"
-    android:divider="@null"
-    android:dividerHeight="0dp"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-    </ListView>
+        android:id="@+id/song_list"
+        android:layout_width="match_parent"
+        android:layout_height="515dp"></ListView>
 
+    <TextView
+        android:id="@+id/overriddenTextPlaylist"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_alignBottom="@+id/song_list" />
 
 </RelativeLayout>

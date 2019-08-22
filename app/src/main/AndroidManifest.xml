@@ -4,26 +4,23 @@
     android:versionCode="1"
     android:versionName="1.0">
 
-    <uses-sdk
-        android:minSdkVersion="21"
-        android:targetSdkVersion="22" />
-
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
-        <service android:name=".MusicService" />
+        <service android:name=".service.MusicService" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
@@ -34,13 +31,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SongPickedActivity"
+            android:name=".activities.SongPickedActivity"
             android:label="@string/title_activity_song_picked" />
         <activity
-            android:name=".EqualizerActivity"
+            android:name=".activities.EqualizerActivity"
             android:label="@string/title_activity_equalizer" />
         <activity
-            android:name=".PlaylistActivity">
+            android:name=".activities.PlaylistActivity">
         </activity>
     </application>
 

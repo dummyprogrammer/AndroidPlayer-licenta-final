@@ -1,33 +1,23 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/full_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#f06d00"
+    android:background="#0A0909"
+    android:weightSum="100"
     android:orientation="vertical"
-    tools:context=".MainActivity" >
-
-
-
-
-    <!--<SeekBar-->
-        <!--android:id="@+id/volume"-->
-        <!--android:layout_marginBottom="50px"-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="wrap_content" >-->
-    <!--</SeekBar>-->
-
-  <!--<ListView-->
-    <!--android:id="@+id/song_list"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent" >-->
-  <!--</ListView>-->
+    tools:context=".activities.MainActivity">
 
     <ListView
-    android:id="@+id/playlist"
-    android:divider="@null"
-    android:dividerHeight="0dp"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-    </ListView>
+        android:id="@+id/playlist"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="80" />
 
-</RelativeLayout>
+    <TextView
+        android:id="@+id/overriddenTextMain"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="20"/>
+
+</LinearLayout>

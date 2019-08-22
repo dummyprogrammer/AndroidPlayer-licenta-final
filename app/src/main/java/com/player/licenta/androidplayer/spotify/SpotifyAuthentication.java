@@ -3,12 +3,10 @@ package com.player.licenta.androidplayer.spotify;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
-import android.provider.BaseColumns;
 import android.util.Log;
 
-import com.player.licenta.androidplayer.Song;
+import com.player.licenta.androidplayer.model.Song;
 import com.player.licenta.androidplayer.database.MoodSortedHelper;
 import com.player.licenta.androidplayer.database.MoodSorterContract;
 

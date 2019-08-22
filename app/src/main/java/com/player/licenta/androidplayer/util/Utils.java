@@ -1,9 +1,8 @@
 package com.player.licenta.androidplayer.util;
 
-import com.player.licenta.androidplayer.Song;
+import com.player.licenta.androidplayer.model.Song;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by razvan on 7/13/18.

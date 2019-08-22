@@ -7,10 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.player.licenta.androidplayer.R;
-import com.player.licenta.androidplayer.Song;
 
 import java.util.ArrayList;
 
@@ -24,79 +24,56 @@ public class PlaylistAdapter extends BaseAdapter {
     private ArrayList<String> genres;
     private LayoutInflater songInf;
 
-    private LinearLayout playlistLayout;
+    private RelativeLayout playlistLayout;
 
     private TextView playlisttextView;
     private String currentGenre;
     private int highlightedRowIndex = INVALID_ROW_INDEX;
 
 
-    public PlaylistAdapter(Context c, ArrayList<String> genres)
-    {
+    public PlaylistAdapter(Context c, ArrayList<String> genres) {
         this.genres = genres;
         songInf = LayoutInflater.from(c);
     }
 
 
     @Override
-    public int getCount()
-    {
+    public int getCount() {
         return genres.size();
     }
 
     @Override
-    public Object getItem(int arg0)
-    {
+    public Object getItem(int arg0) {
         return null;
     }
 
     @Override
-    public long getItemId(int arg0)
-    {
+    public long getItemId(int arg0) {
         return 0;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent)
-    {
+    public View getView(int position, View convertView, ViewGroup parent) {
         //map to song layout
-        playlistLayout = (LinearLayout)songInf.inflate
+        playlistLayout = (RelativeLayout) songInf.inflate
                 (R.layout.playlists, parent, false);
 
-        //get title and artist views
-        playlisttextView = (TextView)playlistLayout.findViewById(R.id.genre);
+        playlisttextView = (TextView) playlistLayout.findViewById(R.id.genre);
 
-        //get song using position
         currentGenre = genres.get(position);
 
-        //get title and artist strings
         playlisttextView.setText(currentGenre);
 
-        if((highlightedRowIndex != INVALID_ROW_INDEX) &&
-                (position == highlightedRowIndex))
-        {
-            playlisttextView.setTextColor(Color.WHITE);
+        if ((highlightedRowIndex != INVALID_ROW_INDEX) &&
+                (position == highlightedRowIndex)) {
+            playlisttextView.setTextColor(Color.BLUE);
         }
 
-
-		/*
-		songLay.setOnClickListener(new OnClickListener()
-		{
-            public void onClick(View v)
-            {
-            	//do stuff here
-            	artistView.setBackgroundColor(Color.CYAN);
-            }
-        });
-		*/
-
-        //set position as tag
         playlistLayout.setTag(currentGenre);
         return playlistLayout;
     }
 
-    public void setHighlightRow()
-    {
+    public void setHighlightRow() {
         //highlightedRowIndex = index;
         notifyDataSetChanged();
     }

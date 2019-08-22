@@ -1,41 +1,54 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools"
-  android:layout_width="fill_parent"
-  android:layout_height="wrap_content"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
   android:onClick="songPicked"
   android:orientation="vertical"
   android:padding="5dp" >
-  
 
- 
-  <TextView
-    android:id="@+id/song_title"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:textColor="#FFFFFF99"
-    android:background="#ea7d23"
-    android:textSize="20sp"
-    android:textStyle="bold" />
- 
+    <ImageView
+        android:id="@+id/songListCover"
+        android:layout_width="64dp"
+        android:layout_height="66dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="61dp"
+        android:layout_marginTop="42dp"
+        android:src="@drawable/fallback_cover" />
+
+    <TextView
+        android:id="@+id/song_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:autoSizeMaxTextSize="16sp"
+        android:layout_alignTop="@+id/songListCover"
+        android:layout_toEndOf="@+id/songListCover"
+        android:background="#0A0909"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
   <TextView
     android:id="@+id/song_artist"
-    android:layout_width="fill_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_toRightOf="@+id/song_title"
-    android:textColor="#FFFFFF99"
-    android:background="#ea7d23"
-    android:textSize="18sp" />
+    android:textColor="#FFFFFF"
+    android:background="#0A0909"
+    android:textSize="16sp"
+    android:layout_alignBottom="@+id/songListCover"
+    android:layout_alignStart="@+id/song_title"/>
 
     <TextView
      android:id="@+id/genre"
-     android:layout_width="fill_parent"
+     android:layout_width="wrap_content"
      android:layout_height="wrap_content"
      android:layout="@id/song_title"
-     android:layout_toRightOf="@+id/song_title"
-     android:textColor="#FFFFFF99"
-     android:background="#ea7d23"
-     android:textSize="18sp" />
+     android:layout_toEndOf="@+id/song_title"
+     android:textColor="#FFFFFF"
+     android:background="#0A0909"
+     android:textSize="16sp" />
 
 
 
-</LinearLayout>
+</RelativeLayout>

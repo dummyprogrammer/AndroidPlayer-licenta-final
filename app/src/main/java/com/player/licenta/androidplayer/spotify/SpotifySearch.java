@@ -81,7 +81,7 @@ public class SpotifySearch extends AsyncTask<String, Void, Void> {
     }
 
     private URI getSearchURI(String songTitle, String songArtist) throws URISyntaxException {
-
+        //TODO
         String songTitleConverted = songTitle.replace(" ", SpotifyConstants.SPACE);
 
         String concatURL = SpotifyConstants.SEARCH_URL + SpotifyConstants.QUERY +

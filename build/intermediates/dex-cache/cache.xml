@@ -30,12 +30,30 @@
     </item>
     <item
         is-multidex="true"
+        jar="/Users/razvan/.gradle/caches/modules-2/files-2.1/com.android.support.constraint/constraint-layout-solver/1.1.2/bfc967828daffc35ba01c9ee204d98b664930a0f/constraint-layout-solver-1.1.2.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="bfc967828daffc35ba01c9ee204d98b664930a0f">
+        <dex dex="/Users/razvan/Downloads/AndroidPlayer-master-5/app/build/intermediates/transforms/dex/debug/folders/1000/10/constraint-layout-solver-1.1.2_a1831b325206da0e5d6e52255ad6a830bc339c7b/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
         jar="/Users/razvan/Downloads/AndroidPlayer-master-5/app/build/intermediates/incremental-classes/debug/instant-run-bootstrap.jar"
         jumboMode="true"
         optimize="true"
         revision="25.0.0"
-        sha1="d1f2cc4814c8c337d739e716edbde3580680704b">
+        sha1="b59f7ee82d65a5a569f6f9d5d636e9ede407c132">
         <dex dex="/Users/razvan/Downloads/AndroidPlayer-master-5/app/build/intermediates/transforms/dex/debug/folders/1000/10000/instant-run-bootstrap_c895b9ba1a0e30f56b4a100ca35871b568fd86bf/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/razvan/.android/build-cache/0a04936483e54d6a3ce965eabf20e6a541f4c2b3/output/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="182370a4a0bba7903c6ff2cb7b6ac21ca4a4bf89">
+        <dex dex="/Users/razvan/Downloads/AndroidPlayer-master-5/app/build/intermediates/transforms/dex/debug/folders/1000/10/classes_11a2e6f86943c0b24eb8ec962c9297f36d5a79d1/classes.dex" />
     </item>
     <item
         is-multidex="true"
@@ -45,6 +63,15 @@
         revision="25.0.0"
         sha1="463f8378feba44df7ba7cd9272d01837dad62b36">
         <dex dex="/Users/razvan/Downloads/AndroidPlayer-master-5/app/build/intermediates/transforms/dex/debug/folders/1000/10/guava-jdk5-17.0_e3bad747d4c9b04e79149a58e8c8c414c65ea564/classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="/Users/razvan/.android/build-cache/9f8e4838069d0524bea18ad2b90cc81919e5d849/output/jars/classes.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="25.0.0"
+        sha1="4486e953d1f35f8ccab098b1dd67146366d5f731">
+        <dex dex="/Users/razvan/Downloads/AndroidPlayer-master-5/app/build/intermediates/transforms/dex/debug/folders/1000/10/classes_3621011d93a571016f005e3067f7191d2b57b82e/classes.dex" />
     </item>
     <item
         is-multidex="true"

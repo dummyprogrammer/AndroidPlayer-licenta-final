@@ -54,7 +54,7 @@ public class SpotifyAuthentication extends AsyncTask<ArrayList<Song>, Void, Void
         return null;
     }
 
-    public String getAuthenticationToken() {
+    private String getAuthenticationToken() {
 
         try {
             URI uri = new URI(SpotifyConstants.AUTH_TOKEN_URL);
@@ -64,7 +64,8 @@ public class SpotifyAuthentication extends AsyncTask<ArrayList<Song>, Void, Void
             httpPost.setHeader(SpotifyConstants.AUTHORIZATION, SpotifyConstants.AUTH_HEADER);
 
             List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair(SpotifyConstants.GRANT_TYPE, SpotifyConstants.CLIENT_CREDENTIALS));
+            params.add(new BasicNameValuePair(SpotifyConstants.GRANT_TYPE,
+                    SpotifyConstants.CLIENT_CREDENTIALS));
             httpPost.setEntity(new UrlEncodedFormEntity(params));
 
             HttpResponse httpResponse = httpClient.execute(httpPost);
@@ -72,7 +73,7 @@ public class SpotifyAuthentication extends AsyncTask<ArrayList<Song>, Void, Void
             InputStream is = httpResponse.getEntity().getContent();
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             String line = "";
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             while ((line = br.readLine()) != null) {
                 sb.append(line);
                 sb.append(" ");
@@ -100,8 +101,8 @@ public class SpotifyAuthentication extends AsyncTask<ArrayList<Song>, Void, Void
 
     private void getTrackData(String mToken) {
         for (Song song: songList){
-            String songTitle = song.getTitle();
-            String songArtist = song.getArtist();
+            String songTitle = song.getSongTitle();
+            String songArtist = song.getSongArtist();
             if(!isSongStored(songTitle, songArtist)){
                 SpotifySearch spotifySearch = new SpotifySearch(mContext);
                 spotifySearch.execute(mToken, songTitle, songArtist);

@@ -101,14 +101,16 @@ public class SpotifySearch extends AsyncTask<String, Void, Void> {
         return null;
     }
 
-    public boolean validateTrack(String json) {
+    private boolean validateTrack(String json) {
         try{
             JSONObject jsonObject = new JSONObject(json);
-            JSONArray items = jsonObject.getJSONObject(SpotifyConstants.TRACKS).getJSONArray(SpotifyConstants.ITEMS);
+            JSONArray items = jsonObject.getJSONObject(SpotifyConstants.TRACKS).
+                                         getJSONArray(SpotifyConstants.ITEMS);
             for (int i = 0; i < items.length(); i++) {
                 String songName = items.getJSONObject(i).getString(SpotifyConstants.NAME);
                 if (songName.toLowerCase().contains(mSongTitle.toLowerCase())) {
-                    JSONArray artistsArray = items.getJSONObject(i).getJSONArray(SpotifyConstants.ARTISTS);
+                    JSONArray artistsArray = items.getJSONObject(i)
+                                                  .getJSONArray(SpotifyConstants.ARTISTS);
                     for (int j = 0; j < artistsArray.length(); j++) {
                         String artistName = artistsArray.getJSONObject(j).getString(SpotifyConstants.NAME);
                         if (artistName.toLowerCase().contains(mSongArtist.toLowerCase())) {

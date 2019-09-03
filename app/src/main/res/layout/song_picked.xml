@@ -5,23 +5,10 @@
     android:background="#000000"
     tools:context=".activities.SongPickedActivity" >
 
-
-    <!--<ImageView-->
-        <!--android:id="@+id/coverArt"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_alignParentStart="true"-->
-        <!--android:layout_alignParentTop="true"-->
-        <!--android:scaleType="fitXY"-->
-        <!--android:src="@drawable/fallback_cover" />-->
-
     <ImageView
         android:id="@+id/coverArt"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/fallback_cover" />
-
-
-
 
 </RelativeLayout>

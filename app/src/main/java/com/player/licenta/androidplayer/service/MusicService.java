@@ -35,6 +35,7 @@ import com.player.licenta.androidplayer.activities.MainActivity;
 public class MusicService extends Service implements
         MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener, MediaController.MediaPlayerControl {
+
     public interface OnSongChangedListener {
         void onSongChanged(Song song);
     }
@@ -137,9 +138,9 @@ public class MusicService extends Service implements
     }
 
     @Override
-    public void onCompletion(MediaPlayer mp) {
+    public void onCompletion(MediaPlayer mediaPlayer) {
         if ( (player.getCurrentPosition() > 0) && (songIndex != -1) ) {
-            mp.reset();
+            mediaPlayer.reset();
             playNext();
             if (onSongChangedListener != null) {
                 onSongChangedListener.onSongChanged(getCurrentSong());
@@ -214,21 +215,13 @@ public class MusicService extends Service implements
     public void playSong(int index) {
         if (index >= 0 && index < songs.size()) {
             songIndex = index;
-
-            //play a song
             player.reset();
-
-            //get song
             Song playSong = songs.get(songIndex);
-            songTitle = playSong.getTitle();
-
-            //get id
+            songTitle = playSong.getSongTitle();
             long currSong = playSong.getID();
-            //set uri
             Uri trackUri = ContentUris.withAppendedId(
                     android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     currSong);
-
             Context context = getApplicationContext();
             songPath = getRealPathFromURI(context, trackUri);
 
@@ -237,7 +230,6 @@ public class MusicService extends Service implements
             } catch (Exception e) {
                 Log.e("MUSIC SERVICE", "Error setting data source", e);
             }
-
             try {
                 player.prepare();
                 player.start();
@@ -255,7 +247,6 @@ public class MusicService extends Service implements
         playSong(prevSongIndex);
     }
 
-    //skip to next
     public void playNext() {
         int nextSongIndex = songIndex;
         if (shuffle) {

@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -81,10 +83,7 @@ public class PlaylistActivity extends Activity {
     private void getSongsFromIntent() {
         songList.clear();
         Intent intent = getIntent();
-        Bundle extras = intent.getExtras();
-
-        chosenGenre = intent.getStringExtra("chosen_genre");
-        songList = (ArrayList<Song>) intent.getSerializableExtra("grouped_songs");
+        songList = (ArrayList<Song>) intent.getSerializableExtra("all_songs");
     }
 
     @Override
@@ -149,8 +148,8 @@ public class PlaylistActivity extends Activity {
         try {
             int songIndex = Integer.parseInt(view.getTag().toString());
             Song currentSong = (Song) songList.get(songIndex);
-            String songTitle = currentSong.getTitle();
-            String songArtist = currentSong.getArtist();
+            String songTitle = currentSong.getSongTitle();
+            String songArtist = currentSong.getSongArtist();
 
             if (songIndex >= 0) {
                 if (songIndex != musicSrv.getSongIndex() || !chosenGenre.equals(lastGenre)) {
@@ -180,15 +179,16 @@ public class PlaylistActivity extends Activity {
         Integer index = Integer.parseInt(view.getTag().toString());
 
         Song currentSong = (Song) songList.get(index);
-        String songTitle = currentSong.getTitle().toString();
-        String songArtist = currentSong.getArtist().toString();
-
+        String songTitle = currentSong.getSongTitle().toString();
+        String songArtist = currentSong.getSongArtist().toString();
         String songPath = musicSrv.getSongPath();
+        Long albumId = currentSong.getAlbumArtId();
 
         Bundle extras = new Bundle();
         extras.putString("SONG_PATH", songPath);
         extras.putString("SONG_ARTIST", songArtist);
         extras.putString("SONG_TITLE", songTitle);
+        extras.putLong("ALBUM_ID", albumId);
 
         intent.putExtras(extras);
 
@@ -205,8 +205,8 @@ public class PlaylistActivity extends Activity {
 
     private void onCredentialsRetrieved() {
         Song currentSong = (Song) songList.get(m_selectedSongIndex);
-        String songTitle = currentSong.getTitle();
-        String songArtist = currentSong.getArtist();
+        String songTitle = currentSong.getSongTitle();
+        String songArtist = currentSong.getSongArtist();
         String[] songInfo = {songArtist, songTitle};
     }
 
@@ -224,5 +224,16 @@ public class PlaylistActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    public void openEqualizerActivity(MenuItem item) {
+        Intent intent = new Intent(this, EqualizerActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.song_picked_activity_menu, menu);
+        return true;
     }
 }

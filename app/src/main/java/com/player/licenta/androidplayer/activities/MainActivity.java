@@ -1,9 +1,11 @@
 package com.player.licenta.androidplayer.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
@@ -16,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -28,12 +31,16 @@ import com.player.licenta.androidplayer.service.MusicService;
 import com.player.licenta.androidplayer.service.MusicService.MusicBinder;
 import com.player.licenta.androidplayer.util.Utils;
 
+import static com.player.licenta.androidplayer.spotify.SpotifyConstants.*;
+
 import java.util.ArrayList;
+import java.util.Random;
 
 public class MainActivity extends Activity {
     private static final int LOADER_ACCESS_TOKEN = 1;
     private ArrayList<Song> songList;
     private ArrayList<String> genresList;
+    private ArrayList<String> groupedPlaylists;
 
     private MusicService musicService;
     private Intent playIntent;
@@ -55,8 +62,11 @@ public class MainActivity extends Activity {
 
     private final static String TAG = "MainActivity";
 
-    private final static String ALL_MUSIC = "all music";
-
+    private final static String ALL_MUSIC = "All Music";
+    private final static String GENRES_PLAYLIST = "Genres playlists";
+    private final static String CREATE_NEW_PLAYLIST = "+ Create new playlist";
+    private static final String RANDOM_PLAYLIST = "Random playlist";
+    private static final String PERSONALIZED_PLAYLIST = "Personalized playlist";
     //connect to the service
     private ServiceConnection musicConnection = new ServiceConnection() {
         @Override
@@ -82,11 +92,15 @@ public class MainActivity extends Activity {
         songList = new ArrayList<Song>();
         getSongList();
         getGenresFromUtils();
+        groupedPlaylists = new ArrayList<>();
+        groupedPlaylists.add(CREATE_NEW_PLAYLIST);
+        groupedPlaylists.add(ALL_MUSIC);
+        groupedPlaylists.add(GENRES_PLAYLIST);
+
         overridenTextView = (TextView) findViewById(R.id.overriddenTextMain);
         genresListView = (ListView) findViewById(R.id.playlist);
-        genresListAdapter = new PlaylistAdapter(this, genresList);
+        genresListAdapter = new PlaylistAdapter(this, groupedPlaylists);
         genresListView.setAdapter(genresListAdapter);
-
 
         Log.d(TAG, "onCreate called");
     }
@@ -117,16 +131,17 @@ public class MainActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.main_activity_menu, menu);
         return true;
     }
 
     public void getSongList() {
         ContentResolver musicResolver = getContentResolver();
         Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
+        Cursor musicCursor = musicResolver.query(musicUri, null,
+                null, null, null);
 
-        String[] genresProjection = {
+        String[] genresProjection = new String[]{
                 MediaStore.Audio.Genres.NAME,
                 MediaStore.Audio.Genres._ID
         };
@@ -134,12 +149,16 @@ public class MainActivity extends Activity {
         if (musicCursor != null && musicCursor.moveToFirst()) {
             int titleColumn = musicCursor.getColumnIndex(android.provider.MediaStore.Audio.Media.TITLE);
             int idColumn = musicCursor.getColumnIndex(android.provider.MediaStore.Audio.Media._ID);
-            int artistColumn = musicCursor.getColumnIndex(android.provider.MediaStore.Audio.Media.ARTIST);
+            int idArtistColumn = musicCursor.getColumnIndex(android.provider.MediaStore.Audio.Media.ARTIST);
+            int idAlbumArt = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
+            int idData = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
 
             do {
                 int songId = musicCursor.getInt(idColumn);
                 String thisTitle = musicCursor.getString(titleColumn);
-                String thisArtist = musicCursor.getString(artistColumn);
+                String thisArtist = musicCursor.getString(idArtistColumn);
+                Long albumArtId = musicCursor.getLong(idAlbumArt);
+                String path = musicCursor.getString(idData);
 
                 Uri uri = MediaStore.Audio.Genres.getContentUriForAudioId("external", songId);
                 Cursor genresCursor = getContentResolver().query(uri,
@@ -152,10 +171,12 @@ public class MainActivity extends Activity {
                         genre += genresCursor.getString(genre_column_index) + " ";
                     } while (genresCursor.moveToNext());
                 }
+                genresCursor.close();
                 if (genre.isEmpty()) {
                     genre = ALL_MUSIC;
                 }
-                songList.add(new Song(songId, thisTitle, thisArtist, genre));
+
+                songList.add(new Song(songId, thisTitle, thisArtist, genre, albumArtId, path));
             }
             while (musicCursor.moveToNext());
         }
@@ -166,40 +187,182 @@ public class MainActivity extends Activity {
         genresList = Utils.getGenres(songList);
     }
 
+    @Override
+    public void onBackPressed() {
+
+    }
+
     public void playlistPicked(View view) {
 
-        ArrayList<Song> groupedSongs = new ArrayList<>();
         String currentGenre = view.getTag().toString();
         if (currentGenre.equals(ALL_MUSIC)) {
-            groupedSongs = songList;
-        } else {
-            groupedSongs = Utils.getGroupedSongs(songList, currentGenre);
+            startAllMusicActivity();
+        } else if (currentGenre.equals(GENRES_PLAYLIST)){
+            startGenresPlaylistActivity();
+        } else if (currentGenre.equals(CREATE_NEW_PLAYLIST)){
+            createNewPlaylistAlertDialog();
+        } else if (currentGenre.equals(RANDOM_PLAYLIST)){
+            startRandomPlaylistActivity();
+        } else if (currentGenre.equals(PERSONALIZED_PLAYLIST)){
+            startPersonalizedPlaylistActivity();
         }
-        Bundle extras = new Bundle();
-        extras.putSerializable("grouped_songs", groupedSongs);
-        extras.putString("chosen_genre", currentGenre);
 
-        Intent intent = new Intent(this, PlaylistActivity.class);
+    }
+
+    private void startPersonalizedPlaylistActivity() {
+        AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
+        builderSingle.setIcon(R.drawable.ic_launcher);
+        builderSingle.setTitle("Select audio feature playlist:-");
+
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice);
+        arrayAdapter.add(ACOUSTICNESS);
+        arrayAdapter.add(DANCEABILITY);
+        arrayAdapter.add(ENERGY);
+        arrayAdapter.add(INSTRUMENTALNESS);
+        arrayAdapter.add(LIVENESS);
+        arrayAdapter.add(LOUDNESS);
+        arrayAdapter.add(SPEECHINESS);
+        arrayAdapter.add(VALENCE);
+
+
+        builderSingle.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builderSingle.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                final String selectedPlaylist = arrayAdapter.getItem(which);
+                AlertDialog.Builder builderInner = new AlertDialog.Builder(MainActivity.this);
+                builderInner.setMessage(selectedPlaylist);
+                builderInner.setTitle("Audio feature playlist selected: ");
+                builderInner.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog,int which) {
+                        dialog.dismiss();
+                        if(!groupedPlaylists.contains(selectedPlaylist)){
+                            groupedPlaylists.add(selectedPlaylist);
+                            genresListAdapter.notifyDataSetChanged();
+                        }
+                    }
+                });
+                builderInner.show();
+            }
+        });
+        builderSingle.show();
+
+    }
+
+    private void startRandomPlaylistActivity() {
+        ArrayList<Song> randomSongs = getRandomSongs();
+        Bundle extras = new Bundle();
+        extras.putSerializable("random_songs", randomSongs);
+        Intent intent = new Intent(this, RandomPlaylistActivity.class);
         intent.putExtras(extras);
 
         startActivity(intent);
 
     }
 
+    private ArrayList<Song> getRandomSongs() {
+        ArrayList<Song> randomSongs = new ArrayList<>();
+        boolean newSongFound = false;
+        int randomElements = -1;
+        if(songList.size() > 0 ){
+            randomElements = songList.size()/3;
+        }
+        if (songList.size() > 10){
+            randomElements = 10;
+            for (int i = 0; i <= randomElements ; i++){
+                if (!newSongFound){
+                    i--;
+                }
+                Random random = new Random();
+                if (songList.size() > 0){
+                    int position = random.nextInt(songList.size());
+                    if (!randomSongs.contains(songList.get(position))){
+                        randomSongs.add(songList.get(position));
+                        newSongFound = true;
+                    }
+                }
+            }
+        }
+        return randomSongs;
+    }
+
+    private void createNewPlaylistAlertDialog() {
+        AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
+        builderSingle.setIcon(R.drawable.ic_launcher);
+        builderSingle.setTitle("Select new playlist:-");
+
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice);
+        arrayAdapter.add(RANDOM_PLAYLIST);
+        arrayAdapter.add(PERSONALIZED_PLAYLIST);
+
+        builderSingle.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builderSingle.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                final String selectedPlaylist = arrayAdapter.getItem(which);
+                AlertDialog.Builder builderInner = new AlertDialog.Builder(MainActivity.this);
+                builderInner.setMessage(selectedPlaylist);
+                builderInner.setTitle("Your Selected Item is");
+                builderInner.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog,int which) {
+                        dialog.dismiss();
+                        if(!groupedPlaylists.contains(selectedPlaylist)){
+                            groupedPlaylists.add(selectedPlaylist);
+                            genresListAdapter.notifyDataSetChanged();
+                        }
+                    }
+                });
+                builderInner.show();
+            }
+        });
+        builderSingle.show();
+    }
+
+    private void startGenresPlaylistActivity() {
+
+        Bundle extras = new Bundle();
+        extras.putSerializable("grouped_genres", genresList);
+        extras.putSerializable("all_songs", songList);
+        Intent intent = new Intent(this, PlaylistGenresActivity.class);
+        intent.putExtras(extras);
+
+        startActivity(intent);
+    }
+
+    private void startAllMusicActivity() {
+
+        Bundle extras = new Bundle();
+        extras.putSerializable("all_songs", songList);
+        Intent intent = new Intent(this, AllMusicActivity.class);
+        intent.putExtras(extras);
+
+        startActivity(intent);
+    }
+
     private void onCredentialsRetrieved() {
         Song currentSong = songList.get(m_selectedSongIndex);
-        String songTitle = currentSong.getTitle();
-        String songArtist = currentSong.getArtist();
+        String songTitle = currentSong.getSongTitle();
+        String songArtist = currentSong.getSongArtist();
         String[] songInfo = {songArtist, songTitle};
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        //menu item selected
         switch (item.getItemId()) {
-            case R.id.sort_item:
-                break;
-
             case R.id.action_shuffle:
                 musicService.setShuffle();
                 break;
@@ -216,11 +379,6 @@ public class MainActivity extends Activity {
         unbindService(musicConnection);
 
         super.onDestroy();
-    }
-
-    private void setController() {
-
-        //controller.show();
     }
 
     @Override
@@ -267,5 +425,10 @@ public class MainActivity extends Activity {
                         }, 100);
             }
         });
+    }
+
+    public void openEqualizerActivity(MenuItem item) {
+        Intent intent = new Intent(this, EqualizerActivity.class);
+        startActivity(intent);
     }
 }

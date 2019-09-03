@@ -1,5 +1,6 @@
 package com.player.licenta.androidplayer.activities;
 
+import com.bumptech.glide.Glide;
 import com.player.licenta.androidplayer.controller.MusicController;
 import com.player.licenta.androidplayer.service.MusicService;
 import com.player.licenta.androidplayer.service.MusicService.MusicBinder;
@@ -7,15 +8,15 @@ import com.player.licenta.androidplayer.util.OnSwipeTouchListener;
 import com.player.licenta.androidplayer.R;
 import com.player.licenta.androidplayer.model.Song;
 
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -36,6 +37,7 @@ public class SongPickedActivity extends Activity {
     private ArrayList<Song> songList;
     private Intent playIntent;
     private SongPickedActivity mInstance;
+    private Long albumId;
 
 
     private final static String TAG = "SongPickedActivity";
@@ -122,11 +124,12 @@ public class SongPickedActivity extends Activity {
         String songFilePath = extras.getString("SONG_PATH");
         String songArtist = extras.getString("SONG_ARTIST");
         String songTitle = extras.getString("SONG_TITLE");
+        albumId = extras.getLong("ALBUM_ID");
 
         coverArt = (ImageView) findViewById(R.id.coverArt);
 
         updateTitle(songArtist, songTitle);
-        extractAlbumArt(songFilePath);
+        extractAlbumArt(albumId);
 
         Log.d(TAG, "onCreate() called");
     }
@@ -158,8 +161,7 @@ public class SongPickedActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.song_picked, menu);
+        getMenuInflater().inflate(R.menu.song_picked_activity_menu, menu);
         return true;
     }
 
@@ -198,28 +200,21 @@ public class SongPickedActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}*/
 
-    public void extractAlbumArt(String songFilePath) {
-        android.media.MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        mmr.setDataSource(songFilePath);
+    @SuppressLint("ClickableViewAccessibility")
+    public void extractAlbumArt(Long albumId) {
 
-        byte[] data = mmr.getEmbeddedPicture();
-        if (data != null) {
-            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-            coverArt.setImageBitmap(bitmap); //associated cover art in bitmap
-        } else {
-            coverArt.setImageResource(R.drawable.fallback_cover); //any default cover resource folder
-        }
+        Uri sArtworkUri = Uri
+                .parse("content://media/external/audio/albumart");
+        Uri albumArtUri = ContentUris.withAppendedId(sArtworkUri, albumId);
 
-		/*coverArt.setAdjustViewBounds(true);
-		coverArt.setLayoutParams(new RelativeLayout.LayoutParams(1000, 500));
-		coverArt.getLayoutParams().height = 1000;*/
-        //coverArt.getLayoutParams().width =  ;
+        Glide.with(this)
+                .load(albumArtUri)
+                .placeholder(R.drawable.fallback_cover)
+                .into(coverArt);
 
         coverArt.setOnTouchListener(new OnSwipeTouchListener(getApplicationContext()) {
             @Override
             public void onSwipeRight() {
-//				Toast.makeText(getApplicationContext(), "Swipe right detected",
-//						Toast.LENGTH_LONG).show();
                 onBackPressed();
             }
         });
@@ -234,10 +229,10 @@ public class SongPickedActivity extends Activity {
     private void updateArtwork() {
         Song currentSong = musicSrv.getCurrentSong();
         if (currentSong != null) {
-            extractAlbumArt(musicSrv.getSongPath());
+            extractAlbumArt(currentSong.getAlbumArtId());
 
-            String songTitle = currentSong.getTitle().toString();
-            String songArtist = currentSong.getArtist().toString();
+            String songTitle = currentSong.getSongTitle().toString();
+            String songArtist = currentSong.getSongArtist().toString();
             updateTitle(songArtist, songTitle);
         }
     }
@@ -259,7 +254,6 @@ public class SongPickedActivity extends Activity {
         }
     }
 
-    //Open Equalizer Activity
     public void openEqualizerActivity(MenuItem item) {
         Intent intent = new Intent(this, EqualizerActivity.class);
         startActivity(intent);

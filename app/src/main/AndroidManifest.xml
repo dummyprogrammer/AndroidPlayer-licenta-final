@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.player.licenta.androidplayer"
     android:versionCode="1"
-    android:versionName="1.0">
+    android:versionName="1.0"
+    tools:ignore="GradleOverrides">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -16,9 +18,9 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
         <service android:name=".service.MusicService" />
-
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
@@ -26,19 +28,35 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".activities.SongPickedActivity"
-            android:label="@string/title_activity_song_picked" />
+            android:label="@string/title_activity_song_picked"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".activities.EqualizerActivity"
-            android:label="@string/title_activity_equalizer" />
+            android:label="@string/title_activity_equalizer"
+            android:screenOrientation="portrait"/>
         <activity
-            android:name=".activities.PlaylistActivity">
-        </activity>
+            android:name=".activities.PlaylistActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.PlaylistGenresActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activities.AllMusicActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activities.SelectedGenreActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activities.RandomPlaylistActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activities.PersonalizedPlaylistActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

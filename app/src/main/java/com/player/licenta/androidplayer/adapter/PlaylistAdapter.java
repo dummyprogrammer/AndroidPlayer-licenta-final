@@ -1,5 +1,6 @@
 package com.player.licenta.androidplayer.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -30,10 +31,12 @@ public class PlaylistAdapter extends BaseAdapter {
     private String currentGenre;
     private int highlightedRowIndex = INVALID_ROW_INDEX;
 
+    private static final String BLUE = "#5fb7ca";
 
-    public PlaylistAdapter(Context c, ArrayList<String> genres) {
+
+    public PlaylistAdapter(Context context, ArrayList<String> genres) {
         this.genres = genres;
-        songInf = LayoutInflater.from(c);
+        songInf = LayoutInflater.from(context);
     }
 
 
@@ -52,21 +55,19 @@ public class PlaylistAdapter extends BaseAdapter {
         return 0;
     }
 
+    @SuppressLint("ViewHolder")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        //map to song layout
         playlistLayout = (RelativeLayout) songInf.inflate
-                (R.layout.playlists, parent, false);
+                (R.layout.genre, parent, false);
 
-        playlisttextView = (TextView) playlistLayout.findViewById(R.id.genre);
-
+        playlisttextView = (TextView) playlistLayout.findViewById(R.id.genreItem);
         currentGenre = genres.get(position);
 
         playlisttextView.setText(currentGenre);
 
-        if ((highlightedRowIndex != INVALID_ROW_INDEX) &&
-                (position == highlightedRowIndex)) {
-            playlisttextView.setTextColor(Color.BLUE);
+        if (position == 0) {
+            playlisttextView.setTextColor(Color.parseColor(BLUE));
         }
 
         playlistLayout.setTag(currentGenre);

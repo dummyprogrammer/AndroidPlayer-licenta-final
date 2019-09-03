@@ -1,5 +1,6 @@
 package com.player.licenta.androidplayer.util;
 
+import com.player.licenta.androidplayer.activities.MainActivity;
 import com.player.licenta.androidplayer.model.Song;
 
 import java.util.ArrayList;
@@ -12,6 +13,8 @@ public class Utils {
 
     private static ArrayList<String> m_genres = new ArrayList<>();
     private static ArrayList<Song> m_groupedSongs = new ArrayList<>();
+
+    private final static String ALL_MUSIC = "All Music";
 
     public static ArrayList<String> getGenres(ArrayList<Song> songs){
 
@@ -34,5 +37,14 @@ public class Utils {
             }
         }
         return m_groupedSongs;
+    }
+
+    public static ArrayList<String> getGroupedPlaylists(ArrayList<String> genres) {
+        for(String genre:genres){
+                if(!genre.equals(ALL_MUSIC)){
+                    m_genres.add(genre);
+                }
+        }
+        return m_genres;
     }
 }

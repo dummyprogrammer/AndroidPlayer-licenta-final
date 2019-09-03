@@ -25,6 +25,16 @@ public class SpotifyConstants {
     public static final String ARTISTS = "artists";
     public static final String ID = "id";
 
+    //Audio features
+    public static final String ACOUSTICNESS = "acousticness";
+    public static final String DANCEABILITY = "danceability";
+    public static final String ENERGY = "energy";
+    public static final String INSTRUMENTALNESS = "instrumentalness";
+    public static final String LIVENESS = "liveness";
+    public static final String LOUDNESS = "loudness";
+    public static final String SPEECHINESS = "speechiness";
+    public static final String VALENCE = "valence";
+
 
 
 

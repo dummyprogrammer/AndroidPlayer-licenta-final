@@ -29,15 +29,15 @@
         android:textSize="20sp"
         android:textStyle="bold" />
 
-  <TextView
-    android:id="@+id/song_artist"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textColor="#FFFFFF"
-    android:background="#0A0909"
-    android:textSize="16sp"
-    android:layout_alignBottom="@+id/songListCover"
-    android:layout_alignStart="@+id/song_title"/>
+      <TextView
+        android:id="@+id/song_artist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
+        android:background="#0A0909"
+        android:textSize="16sp"
+        android:layout_alignBottom="@+id/songListCover"
+        android:layout_alignStart="@+id/song_title"/>
 
     <TextView
      android:id="@+id/genre"
@@ -48,7 +48,5 @@
      android:textColor="#FFFFFF"
      android:background="#0A0909"
      android:textSize="16sp" />
-
-
 
 </RelativeLayout>

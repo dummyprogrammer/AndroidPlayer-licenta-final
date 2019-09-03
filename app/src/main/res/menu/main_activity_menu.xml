@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
  
-  <item
+    <item
     android:id="@+id/action_shuffle"
     android:icon="@drawable/rand"
     android:orderInCategory="1"
@@ -8,10 +8,11 @@
     android:title="Shuffle"/>
 
     <item
-        android:id="@+id/sort_item"
-        android:icon="@drawable/tools"
-        android:orderInCategory="2"
-        android:showAsAction="always"
-        android:title="End"/>
- 
+    android:id="@+id/action_equalizer"
+    android:icon="@drawable/equalizer"
+    android:orderInCategory="1"
+    android:showAsAction="always"
+    android:onClick="openEqualizerActivity"
+    android:title="Equalizer"/>
+
 </menu>

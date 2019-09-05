@@ -2,6 +2,7 @@ package com.player.licenta.androidplayer.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -29,16 +30,20 @@ import com.player.licenta.androidplayer.controller.MusicController;
 import com.player.licenta.androidplayer.model.Song;
 import com.player.licenta.androidplayer.service.MusicService;
 import com.player.licenta.androidplayer.service.MusicService.MusicBinder;
+import com.player.licenta.androidplayer.spotify.SpotifyAuthentication;
 import com.player.licenta.androidplayer.util.Utils;
 
+import static com.player.licenta.androidplayer.spotify.SpotifyAuthentication.songFeatureCache;
 import static com.player.licenta.androidplayer.spotify.SpotifyConstants.*;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Random;
 
 public class MainActivity extends Activity {
     private static final int LOADER_ACCESS_TOKEN = 1;
     private ArrayList<Song> songList;
+    private ArrayList<Song> featuredSongList;
     private ArrayList<String> genresList;
     private ArrayList<String> groupedPlaylists;
 
@@ -53,6 +58,8 @@ public class MainActivity extends Activity {
     private ListView songView;
     private ListView genresListView;
     private TextView overridenTextView;
+
+    ProgressDialog mDialog;
 
     private boolean paused = false, playbackPaused = false;
 
@@ -204,12 +211,14 @@ public class MainActivity extends Activity {
         } else if (currentGenre.equals(RANDOM_PLAYLIST)){
             startRandomPlaylistActivity();
         } else if (currentGenre.equals(PERSONALIZED_PLAYLIST)){
-            startPersonalizedPlaylistActivity();
+            startPersonalizedPlaylistAlertDialog();
+        } else {
+            startPersonalizedPlaylistActivity(currentGenre);
         }
 
     }
 
-    private void startPersonalizedPlaylistActivity() {
+    private void startPersonalizedPlaylistAlertDialog() {
         AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
         builderSingle.setIcon(R.drawable.ic_launcher);
         builderSingle.setTitle("Select audio feature playlist:-");
@@ -246,6 +255,10 @@ public class MainActivity extends Activity {
                         if(!groupedPlaylists.contains(selectedPlaylist)){
                             groupedPlaylists.add(selectedPlaylist);
                             genresListAdapter.notifyDataSetChanged();
+                            sendInfoToSpotifyTask(songList, selectedPlaylist);
+                            mDialog = new ProgressDialog(MainActivity.this);
+                            mDialog.setMessage("Please wait...");
+                            mDialog.show();
                         }
                     }
                 });
@@ -253,6 +266,39 @@ public class MainActivity extends Activity {
             }
         });
         builderSingle.show();
+
+
+    }
+
+    public void hideProgressDialog(){
+        mDialog.hide();
+    }
+
+    public void sendInfoToSpotifyTask(ArrayList<Song> songList, String chosenfeature) {
+        SpotifyAuthentication spotifyAuthentication = new SpotifyAuthentication(getApplicationContext(), chosenfeature, this);
+        spotifyAuthentication.execute(songList);
+    }
+
+    private void startPersonalizedPlaylistActivity(String selectedPlaylist) {
+
+        Bundle extras = new Bundle();
+        getFeaturedSongs(selectedPlaylist);
+        extras.putSerializable("featured_songs", featuredSongList);
+        extras.putString("chosenFeature", selectedPlaylist);
+        Intent intent = new Intent(this, PersonalizedPlaylistActivity.class);
+        intent.putExtras(extras);
+
+        startActivity(intent);
+    }
+
+    private void getFeaturedSongs(String selectedPlaylist) {
+        featuredSongList = new ArrayList<>();
+        for (Map.Entry<String, Song> item : songFeatureCache.entrySet()) {
+            String key = item.getKey();
+            if(key.equals(selectedPlaylist)){
+                featuredSongList.add(item.getValue());
+            }
+        }
 
     }
 
@@ -319,10 +365,15 @@ public class MainActivity extends Activity {
                 builderInner.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog,int which) {
-                        dialog.dismiss();
-                        if(!groupedPlaylists.contains(selectedPlaylist)){
-                            groupedPlaylists.add(selectedPlaylist);
-                            genresListAdapter.notifyDataSetChanged();
+                        if(selectedPlaylist.equals(PERSONALIZED_PLAYLIST)){
+                            dialog.dismiss();
+                            startPersonalizedPlaylistAlertDialog();
+                        } else {
+                            dialog.dismiss();
+                            if(!groupedPlaylists.contains(selectedPlaylist)){
+                                groupedPlaylists.add(selectedPlaylist);
+                                genresListAdapter.notifyDataSetChanged();
+                            }
                         }
                     }
                 });

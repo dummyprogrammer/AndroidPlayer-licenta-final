@@ -161,16 +161,10 @@ public class PlaylistActivity extends Activity {
                 controller.show();
                 showCoverArtActivity(view);
                 sendInfoToLyricsWS(view);
-                sendInfoToSpotifyTask(songList);
             }
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
         }
-    }
-
-    public void sendInfoToSpotifyTask(ArrayList<Song> songList) {
-        SpotifyAuthentication spotifyAuthentication = new SpotifyAuthentication(getApplicationContext());
-        spotifyAuthentication.execute(songList);
     }
 
 

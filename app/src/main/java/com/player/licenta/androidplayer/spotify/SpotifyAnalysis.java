@@ -1,14 +1,10 @@
 package com.player.licenta.androidplayer.spotify;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.player.licenta.androidplayer.database.MoodSortedHelper;
-import com.player.licenta.androidplayer.database.MoodSorterContract;
-import com.player.licenta.androidplayer.entity.MoodSorterEntity;
+import com.player.licenta.androidplayer.model.Song;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -24,6 +20,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
+
+import static com.player.licenta.androidplayer.spotify.SpotifySearch.counterValidatedTrackId;
 
 /**
  * Created by razvan on 8/29/18.
@@ -37,9 +36,17 @@ public class SpotifyAnalysis extends AsyncTask<String, Void, Void> {
     private Context mContext;
     private String mSongTitle;
     private String mSongArtist;
+    private String mChosenFeature;
+    private Song mSong;
 
-    public SpotifyAnalysis(Context context) {
+
+    public static int analysisFeatureCount = 0;
+
+    public SpotifyAnalysis(Context context, Song song, String token, String trackId) {
         mContext = context;
+        mSong = song;
+        mToken = token;
+        mTrackId = trackId;
     }
 
     @Override
@@ -48,11 +55,12 @@ public class SpotifyAnalysis extends AsyncTask<String, Void, Void> {
         mToken = strings[1];
         mSongTitle = strings[2];
         mSongArtist = strings[3];
+        mChosenFeature = strings[4];
         getAudioFeatures();
         return null;
     }
 
-    public void getAudioFeatures() {
+    public String getAudioFeatures() {
 
         try {
             URI uri = getSearchURI();
@@ -72,21 +80,21 @@ public class SpotifyAnalysis extends AsyncTask<String, Void, Void> {
                 sb.append(" ");
             }
             String response = sb.toString();
-            insertDataToDB(response);
             Log.d(TAG, response);
+
+            return response;
+
         } catch (URISyntaxException ex) {
             ex.printStackTrace();
         } catch (ClientProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
-
+        return null;
     }
 
-    public void insertDataToDB(String response) throws JSONException {
+    /*public void insertDataToDB(String response) throws JSONException {
 
         MoodSortedHelper moodSortedHelper = new MoodSortedHelper(mContext);
         SQLiteDatabase db = moodSortedHelper.getWritableDatabase();
@@ -129,7 +137,7 @@ public class SpotifyAnalysis extends AsyncTask<String, Void, Void> {
         moodSorterEntity.setSongartist(mSongArtist);
 
         return moodSorterEntity;
-    }
+    }*/
 
     public URI getSearchURI() throws URISyntaxException {
         String uri = SpotifyConstants.AUDIO_FEATURES_URL + mTrackId;

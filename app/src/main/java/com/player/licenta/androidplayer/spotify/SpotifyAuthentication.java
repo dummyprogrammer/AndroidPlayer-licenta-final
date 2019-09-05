@@ -1,14 +1,14 @@
 package com.player.licenta.androidplayer.spotify;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.player.licenta.androidplayer.R;
+import com.player.licenta.androidplayer.activities.MainActivity;
 import com.player.licenta.androidplayer.model.Song;
-import com.player.licenta.androidplayer.database.MoodSortedHelper;
-import com.player.licenta.androidplayer.database.MoodSorterContract;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -28,22 +28,32 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import static com.player.licenta.androidplayer.spotify.SpotifySearch.checkChosenFeature;
 
 /**
  * Created by razvan on 8/27/18.
  */
 
-public class SpotifyAuthentication extends AsyncTask<ArrayList<Song>, Void, Void> {
+public class SpotifyAuthentication extends AsyncTask<ArrayList<Song>, String, Void> {
 
     private String mToken;
     private ArrayList<Song> songList;
     private Context mContext;
+    private String mChosenFeature;
+    private MainActivity mainActivity;
+
+
+    public static HashMap<String, Song> songFeatureCache = new HashMap<>();
 
     private final static String TAG = "SpotifyAuthentication";
 
-    public SpotifyAuthentication(Context context){
+    public SpotifyAuthentication(Context context, String chosenFeature, MainActivity activity){
         mContext = context;
+        this.mChosenFeature = chosenFeature;
+        this.mainActivity = activity;
     }
 
     @Override
@@ -99,68 +109,44 @@ public class SpotifyAuthentication extends AsyncTask<ArrayList<Song>, Void, Void
         return mToken;
     }
 
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+    }
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+        mainActivity.hideProgressDialog();
+    }
+
     private void getTrackData(String mToken) {
-        for (Song song: songList){
+        checkChosenFeature = mChosenFeature;
+        for (Song song : songList) {
             String songTitle = song.getSongTitle();
             String songArtist = song.getSongArtist();
-            if(!isSongStored(songTitle, songArtist)){
-                SpotifySearch spotifySearch = new SpotifySearch(mContext);
-                spotifySearch.execute(mToken, songTitle, songArtist);
+            SpotifySearch spotifySearch = new SpotifySearch(mContext, song, mToken);
+            String trackId = spotifySearch.getTrackInfo(mToken, songTitle, songArtist, mChosenFeature);
+            if(trackId != null){
+                SpotifyAnalysis spotifyAnalysis = new SpotifyAnalysis(mContext, song, mToken, trackId);
+                String audioFeatures = spotifyAnalysis.getAudioFeatures();
+                if (audioFeatures != null){
+                    try {
+                        JSONObject jsonObject = new JSONObject(audioFeatures);
+                        double featureValue = jsonObject.getDouble(mChosenFeature);
+                        if(featureValue > 0.6){
+                            songFeatureCache.put(mChosenFeature, song);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
+
+
     }
 
 
-    public boolean isSongStored(String songTitle, String songArtist){
-
-        selectAllRecords();
-        //mContext.deleteDatabase(MoodSortedHelper.DATABASE_NAME);
-
-        MoodSortedHelper moodSortedHelper = new MoodSortedHelper(mContext);
-        SQLiteDatabase db = moodSortedHelper.getReadableDatabase();
-
-        String[] projection = {
-                MoodSorterContract.MoodSorterEntry.COLUMN_NAME_SONGTITLE,
-                MoodSorterContract.MoodSorterEntry.COLUMN_NAME_SONGARTIST
-        };
-        String selection = MoodSorterContract.MoodSorterEntry.COLUMN_NAME_SONGTITLE + " =?" +
-                " AND " + MoodSorterContract.MoodSorterEntry.COLUMN_NAME_SONGARTIST + " =?" ;
-        String[] selectionArgs = {songTitle, songArtist};
-
-        Cursor cursor = db.query(
-                MoodSorterContract.MoodSorterEntry.TABLE_NAME,
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                null
-            );
-        if((cursor != null) && !(cursor.getCount() == 0)){
-            return true;
-        }
-        cursor.close();
-        db.close();
-        return false;
-    }
-
-    public void selectAllRecords() {
-        MoodSortedHelper moodSortedHelper = new MoodSortedHelper(mContext);
-        SQLiteDatabase db = moodSortedHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM moodsorter", null);
-        List<String> records = new ArrayList<>();
-        if (cursor.moveToFirst()){
-            records.add(cursor.getString(cursor.getColumnIndex(MoodSorterContract.MoodSorterEntry.COLUMN_NAME_SONGTITLE)));
-            while(cursor.moveToNext()){
-                records.add(cursor.getString(cursor.getColumnIndex(MoodSorterContract.MoodSorterEntry.COLUMN_NAME_SONGTITLE)));
-            }
-        }
-        cursor.close();
-        db.close();
-
-        for (String songTitle: records){
-            Log.d(TAG, "Song titles in the database: " + songTitle);
-        }
-    }
 
 }

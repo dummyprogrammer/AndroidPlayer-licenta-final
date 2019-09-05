@@ -1,9 +1,10 @@
 package com.player.licenta.androidplayer.spotify;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.player.licenta.androidplayer.model.Song;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -32,15 +33,26 @@ public class SpotifySearch extends AsyncTask<String, Void, Void> {
     private String mSongTitle;
     private String mSongArtist;
     private Context mContext;
+    private String mToken;
+    private Song mSong;
 
-    public SpotifySearch(Context context){
+    public static String checkChosenFeature;
+    public static int counterValidatedTrackId = 0;
+
+
+    public SpotifySearch(Context context, Song song, String token) {
         mContext = context;
+        mSong = song;
+        mToken = token;
     }
 
-    public void getTrackInfo(String authToken, String songTitle, String songArtist) {
+    public String getTrackInfo(String authToken, String songTitle, String songArtist, String chosenFeature) {
         try {
 
             mSongTitle = songTitle;
+            if (mSongTitle.contains("(") && mSongTitle.contains(")")) {
+                mSongTitle = mSongTitle.substring(0, mSongTitle.indexOf("("));
+            }
             mSongArtist = songArtist;
 
             URI uri = getSearchURI(songTitle, songArtist);
@@ -61,12 +73,13 @@ public class SpotifySearch extends AsyncTask<String, Void, Void> {
             }
             String response = sb.toString();
             boolean isSongFound = validateTrack(response);
-            if(isSongFound){
-                SpotifyAnalysis spotifyAnalysis = new SpotifyAnalysis(mContext);
-                spotifyAnalysis.execute(mTrackId, authToken, songTitle, songArtist);
-                Log.d(TAG,"Song found" + mTrackId);
+            if (isSongFound) {
+                //SpotifyAnalysis spotifyAnalysis = new SpotifyAnalysis(mContext, mSong, mToken);
+                //spotifyAnalysis.execute(mTrackId, authToken, songTitle, songArtist, chosenFeature);
+                Log.d(TAG, "Song found" + mTrackId);
+                return mTrackId;
             } else {
-                Log.d(TAG,"Song not found");
+                Log.d(TAG, "Song not found");
             }
             Log.d(TAG, "Response from Spotify" + response);
 
@@ -78,14 +91,16 @@ public class SpotifySearch extends AsyncTask<String, Void, Void> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
-    private URI getSearchURI(String songTitle, String songArtist) throws URISyntaxException {
+    public URI getSearchURI(String songTitle, String songArtist) throws URISyntaxException {
         //TODO
         String songTitleConverted = songTitle.replace(" ", SpotifyConstants.SPACE);
+        String songArtistConverted = songArtist.replace(" ", SpotifyConstants.SPACE);
 
         String concatURL = SpotifyConstants.SEARCH_URL + SpotifyConstants.QUERY +
-                songTitleConverted + SpotifyConstants.AND +
+                songTitleConverted + SpotifyConstants.SPACE + songArtistConverted + SpotifyConstants.AND +
                 SpotifyConstants.TYPE + SpotifyConstants.TRACK;
         Log.d(TAG, concatURL);
         return new URI(concatURL);
@@ -97,20 +112,21 @@ public class SpotifySearch extends AsyncTask<String, Void, Void> {
         String authToken = songData[0];
         String songTitle = songData[1];
         String songArtist = songData[2];
-        getTrackInfo(authToken, songTitle, songArtist);
+        String chosenFeature = songData[3];
+        getTrackInfo(authToken, songTitle, songArtist, chosenFeature);
         return null;
     }
 
-    private boolean validateTrack(String json) {
-        try{
+    public boolean validateTrack(String json) {
+        try {
             JSONObject jsonObject = new JSONObject(json);
             JSONArray items = jsonObject.getJSONObject(SpotifyConstants.TRACKS).
-                                         getJSONArray(SpotifyConstants.ITEMS);
+                    getJSONArray(SpotifyConstants.ITEMS);
             for (int i = 0; i < items.length(); i++) {
                 String songName = items.getJSONObject(i).getString(SpotifyConstants.NAME);
                 if (songName.toLowerCase().contains(mSongTitle.toLowerCase())) {
                     JSONArray artistsArray = items.getJSONObject(i)
-                                                  .getJSONArray(SpotifyConstants.ARTISTS);
+                            .getJSONArray(SpotifyConstants.ARTISTS);
                     for (int j = 0; j < artistsArray.length(); j++) {
                         String artistName = artistsArray.getJSONObject(j).getString(SpotifyConstants.NAME);
                         if (artistName.toLowerCase().contains(mSongArtist.toLowerCase())) {
@@ -121,7 +137,7 @@ public class SpotifySearch extends AsyncTask<String, Void, Void> {
                     }
                 }
             }
-        } catch (JSONException exception){
+        } catch (JSONException exception) {
             exception.printStackTrace();
         }
         return false;
